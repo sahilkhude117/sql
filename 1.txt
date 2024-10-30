@@ -1,0 +1,49 @@
+Passenger => (pid, pname, mobno, email, city) 
+Flight_info => (fid, src, desti, date, amtpaid, pid) 
+Create two tables as per given structure and execute followings.. 
+• Modify flight id to ‘AIR1005’ of a flighthaving fid as ‘AIR1002’. 
+• Display the total count of passengers for each flight 
+• Write a stored procedure to display passenger record whose ID is ‘P1122’. 
+• Display the passenger name and amount paid by each.
+
+CREATE TABLE Passenger (
+ PID VARCHAR(10) PRIMARY KEY,
+ pname VARCHAR(50),
+ mobno VARCHAR(15),
+ email VARCHAR(50),
+ city VARCHAR(50)
+);
+
+CREATE TABLE Flight_info (
+ FID VARCHAR(10) PRIMARY KEY,
+ Source VARCHAR(50),
+ Destination VARCHAR(50),
+ JDate DATE,
+ AmtPaid DECIMAL(10, 2),
+ PID VARCHAR(10),
+ FOREIGN KEY (PID) REFERENCES Passenger(PID)
+);
+
+-- Modify flight id
+UPDATE Flight_info SET FID = 'AIR1005' WHERE FID = 'AIR1002';
+
+-- Display total passenger count per flight
+SELECT FID, 
+COUNT(PID) AS passenger_count 
+FROM Flight_info 
+GROUP BY FID;
+
+-- Stored procedure to display a passenger record
+DELIMITER //
+CREATE PROCEDURE GetPassengerByID(IN pID VARCHAR(10))
+BEGIN
+ SELECT * FROM Passenger WHERE PID = pID;
+END //
+DELIMITER ;
+
+-- Display passenger names and amounts paid
+SELECT pname, AmtPaid 
+FROM Passenger 
+JOIN Flight_info 
+ON Passenger.PID = Flight_info.PID;
+

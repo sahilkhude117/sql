@@ -1,0 +1,24 @@
+Create tables and perform following operations • Group BY based SQL VIEW • SQL INNER 
+Join • Add a new column to the table
+
+-- a. Group BY-based SQL VIEW
+CREATE VIEW StudentBranchView 
+AS
+SELECT branch, 
+COUNT(sid) AS student_count 
+FROM Stud_info 
+GROUP BY branch;
+
+-- b. SQL INNER Join to fetch matching records
+SELECT s.sid, s.sname, b.bname 
+FROM Stud_info s 
+INNER JOIN Book_info b 
+ON s.sid = b.sid;
+
+-- c. Add a new column to the table
+ALTER TABLE Stud_info 
+ADD COLUMN grade VARCHAR(5);
+
+-- d. Display records using BETWEEN operator
+SELECT * FROM Stud_info 
+WHERE semester BETWEEN 1 AND 4;

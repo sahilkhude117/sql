@@ -1,0 +1,30 @@
+Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching minimum number of courses • Group 
+instructors based on courses • Drop ‘city’ column from Student_details table
+
+-- a. Modify flight id to ‘AIR1005’ for flight with fid ‘AIR1002’
+UPDATE Flight_info 
+SET FID = 'AIR1005' 
+WHERE FID = 'AIR1002';
+
+-- b. Display total count of passengers per flight
+SELECT FID, 
+COUNT(PID) AS passenger_count 
+FROM Flight_info 
+GROUP BY FID;
+
+-- c. Stored procedure to display passenger record with ID ‘P1122’
+DELIMITER //
+CREATE PROCEDURE GetPassengerByID(IN pID VARCHAR(10))
+BEGIN
+ SELECT * FROM Passenger WHERE PID = pID;
+END //
+DELIMITER ;
+
+-- d. Display passenger name and amount paid by each
+SELECT pname, AmtPaid 
+FROM Passenger 
+JOIN Flight_info 
+ON Passenger.PID = Flight_info.PID;

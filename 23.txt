@@ -1,0 +1,34 @@
+Table : employee => empid, ename, designation, mobno, email, city, dept_id, For the 
+given table structure, execute followings.. • Create a Trigger based on Delete operation • A 
+VIEW to show the number of employees coming from same city. • Display employee 
+names having ‘h’ as last alphabet. • Show the use of SQL subquery
+
+-- a. Create a trigger on DELETE or UPDATE operation
+DELIMITER //
+CREATE TRIGGER EmployeeUpdateDelete 
+BEFORE DELETE 
+ON Employee
+FOR EACH ROW
+BEGIN
+ INSERT INTO Employee_log (empid, action, action_date) VALUES (OLD.empid, 'DELETE', 
+NOW());
+END //
+DELIMITER ;
+
+-- b. View to show employees from the same city
+CREATE VIEW EmpCityCount 
+AS
+SELECT city, 
+COUNT(empid) AS employee_count 
+FROM Employee 
+GROUP BY city;
+
+-- c. Display employee names with ‘h’ as last alphabet
+SELECT ename 
+FROM Employee 
+WHERE ename LIKE '%h';
+
+-- d. Change the designation of an employee with empid ‘1101’
+UPDATE Employee 
+SET designation = 'Manager' 
+WHERE empid = '1101';

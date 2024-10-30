@@ -1,0 +1,29 @@
+Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • Group By with Having •
+Display the name of students scoring less than the average marks in subj1. • A Trigger 
+based on DELETE operation performed on stud_marks.
+
+-- a. VIEW showing the number of students per branch
+CREATE VIEW StudentCountByBranch 
+AS
+SELECT branch, 
+COUNT(sid) AS student_count 
+FROM Stud_marks 
+GROUP BY branch;
+
+-- b. Add 2% extra marks for students scoring less than 40 in sbj2
+UPDATE Stud_marks 
+SET sbj2_mark = sbj2_mark * 1.02 
+WHERE sbj2_mark < 40;
+
+-- c. Display students scoring more than average in sbj4
+SELECT sname 
+FROM Stud_marks 
+WHERE sbj4_mark > (SELECT AVG(sbj4_mark) 
+                   FROM 
+                   Stud_marks);
+
+-- d. Modify branch to ‘EXTC’ for student with id ‘2001’
+UPDATE Stud_marks 
+SET branch = 'EXTC' 
+WHERE sid = '2001';

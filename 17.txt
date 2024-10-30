@@ -1,0 +1,31 @@
+For the student table (sid, sname, branch, age, mobno, city) write SQL statement: • Create 
+a SQL stored procedure using IN and OUT parameter • Modify the city name to ‘MUMBAI’ 
+for the student with sid as ‘1211’ • Show the use of Group By with Having • Drop Primary 
+Key
+
+-- a. Stored procedure using IN and OUT parameters
+DELIMITER //
+CREATE PROCEDURE GetStudentDetails(IN studentID VARCHAR(10), OUT studentName VARCHAR(50))
+BEGIN
+ SELECT sname 
+ INTO studentName 
+ FROM Student_info 
+ WHERE sid = studentID;
+END //
+DELIMITER ;
+
+-- b. Modify city name to ‘MUMBAI’ for student with sid ‘1211’
+UPDATE Student_info 
+SET city = 'MUMBAI' 
+WHERE sid = '1211';
+
+-- c. Use GROUP BY with HAVING
+SELECT city, 
+COUNT(sid) AS student_count 
+FROM Student_info 
+GROUP BY city 
+HAVING student_count > 1;
+
+-- d. Drop primary key
+ALTER TABLE Student_info 
+DROP PRIMARY KEY;

@@ -1,0 +1,29 @@
+Consider an appropriate TABLE to perform followings • SQL Trigger using IF ELSE 
+programming construct for grading students’ performance • Display information using 
+Subquery • Rename a Table
+
+-- a. Trigger using IF ELSE construct
+DELIMITER //
+CREATE TRIGGER CheckInsert 
+BEFORE INSERT 
+ON ExampleTable
+FOR EACH ROW
+BEGIN
+ IF NEW.amount > 1000 
+ THEN
+ SET NEW.status = 'High';
+ ELSE
+ SET NEW.status = 'Low';
+ END IF;
+END //
+DELIMITER ;
+
+-- b. Display information using Subquery
+SELECT * FROM ExampleTable 
+WHERE id IN (SELECT id 
+             FROM AnotherTable 
+             WHERE condition);
+
+-- c. Rename a column
+ALTER TABLE ExampleTable 
+RENAME COLUMN old_column_name TO new_column_name;

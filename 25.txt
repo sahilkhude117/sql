@@ -1,0 +1,28 @@
+Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • List student names having 
+‘a’ as last alphabet in their names. • Display the name of students scoring less than the 
+average marks in subj1. • A Trigger based on DELETE operation performed on stud_marks.
+
+-- a. List student names with ‘a’ as the last alphabet
+SELECT sname 
+FROM Stud_marks 
+WHERE sname LIKE '%a';
+
+-- b. Display names of students scoring less than average in sbj1
+SELECT sname 
+FROM Stud_marks 
+WHERE sbj1_mark < (SELECT AVG(sbj1_mark) 
+                   FROM 
+                   Stud_marks);
+
+-- c. Stored procedure to display students from a specific branch
+DELIMITER //
+CREATE PROCEDURE GetStudentsByBranch(IN branchName VARCHAR(50))
+BEGIN
+ SELECT * FROM Stud_marks WHERE branch = branchName;
+END //
+DELIMITER ;
+
+-- d. Add new column Grade
+ALTER TABLE Stud_marks 
+ADD COLUMN grade VARCHAR(5);

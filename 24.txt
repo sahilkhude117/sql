@@ -1,0 +1,29 @@
+ Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total For the given table structure, execute followings... • A Trigger to add total marks for 
+each student while inserting a new record. • Display the average, minimum and maximum 
+marks scored in subj3 • A VIEW to show number of students as per branch.
+
+-- a. Trigger to add total marks on inserting a new record
+DELIMITER //
+CREATE TRIGGER AddTotalMarks 
+BEFORE INSERT 
+ON Stud_marks
+FOR EACH ROW
+BEGIN
+ SET NEW.total = NEW.sbj1_mark + NEW.sbj2_mark + NEW.sbj3_mark + NEW.sbj4_mark;
+END //
+DELIMITER ;
+
+-- b. Display average, minimum, maximum marks in sbj3
+SELECT AVG(sbj3_mark) AS avg_mark, 
+       MIN(sbj3_mark) AS min_mark, 
+       MAX(sbj3_mark) AS max_mark
+FROM Stud_marks;
+
+-- c. Display names of students scoring less than average in sbj4
+SELECT sname 
+FROM Stud_marks 
+WHERE sbj4_mark < (SELECT AVG(sbj4_mark) 
+                   FROM 
+                   Stud_marks);
+

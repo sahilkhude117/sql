@@ -1,0 +1,24 @@
+Student _details=> sid, sname, email, city, semester , course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Modify the size of column called ‘city’ to 30 
+characters. • Add foreign key to Instructor table • Display students and Instructors names 
+using LEFT Join • Modify the dept_name to ‘EXTC’ for the instructor with id as ‘1001’ •
+Display the number of students coming from the city ‘MUMBAI
+
+-- a. Modify the size of ‘city’ column to 30 characters
+ALTER TABLE Student_details 
+MODIFY city VARCHAR(30);
+
+-- b. Perform RIGHT OUTER JOIN
+SELECT s.sname, i.Instructor_name 
+FROM Student_details s 
+RIGHT JOIN Instructor_info i 
+ON s.course_id = i.course_id;
+
+-- c. Display all records from Student_details using JDBC connection
+// Sample JDBC code to retrieve records from Student_details
+
+-- d. Display number of students coming from the city ‘MUMBAI’
+SELECT COUNT(*) AS mumbai_students 
+FROM Student_details 
+WHERE city = 'MUMBAI';

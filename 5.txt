@@ -1,0 +1,23 @@
+Customer_details => cid, cname, mobno, email, city Account_info => Ac_no, Ac_type, 
+Balance, branch_name, cid For the given table structure, execute followings.. • Type of 
+accounts opened by customer ‘Ajay’ • Display balance after sdding 7% interest to all 
+accounts • One SQL subquery • A VIEW to show total balance amount as per branch
+
+-- Display account type by customer name
+SELECT Ac_type 
+FROM Account_info 
+JOIN Customer_details 
+ON Account_info.cid = Customer_details.cid 
+WHERE cname = 'Ajay';
+
+-- Display balance with 7% interest
+SELECT Balance * 1.07 AS NewBalance 
+FROM Account_info;
+
+-- View for total balance per branch
+CREATE VIEW TotalBalancePerBranch 
+AS 
+SELECT branch_name,
+SUM(Balance) AS TotalBalance 
+FROM Account_info 
+GROUP BY branch_name;

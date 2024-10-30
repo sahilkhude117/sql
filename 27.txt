@@ -1,0 +1,33 @@
+Stud_info => sid, sname, branch, semester, mobno, email Book_info => bid, bname, 
+author, issue_date, sid 27. For the given table structure, execute followings... • Create a 
+VIEW based on SQL JOIN (Inner or Outer) • Display student names starting with “Ra” •
+Display names of students those who have issued a book with bname as “Programming”. •
+Modify the author name of the book having bid as ‘BK11001’ to ‘Henry J.’
+
+-- a. Create VIEW using JOIN (Inner or Outer)
+CREATE VIEW StudentBookView 
+AS
+SELECT s.sid, s.sname, b.bname 
+FROM Stud_info s 
+INNER JOIN Book_info b 
+ON s.sid = b.sid;
+
+-- b. Define stored procedure with OUT parameter
+DELIMITER //
+CREATE PROCEDURE GetStudentBranch(IN sid VARCHAR(10), OUT branchName VARCHAR(50))
+BEGIN
+ SELECT branch INTO branchName FROM Stud_info WHERE sid = sid;
+END //
+DELIMITER ;
+
+-- c. Display students who issued book named “Programming”
+SELECT sname 
+FROM Stud_info 
+JOIN Book_info 
+ON Stud_info.sid = Book_info.sid 
+WHERE bname = 'Programming';
+
+-- d. Modify author name to ‘Henry J.’ for book with bid ‘BK111’
+UPDATE Book_info 
+SET author = 'Henry J.' 
+WHERE bid = 'BK111';

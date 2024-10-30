@@ -1,0 +1,35 @@
+Table : employee => empid, ename, designation, mobno, email, city, dept_id, For the given 
+table structure, execute followings.. • Create a Trigger based on Insert operation • A VIEW 
+to show the number of employees in each department. • Modify mobno to ‘9898989898’ 
+for the employee whose empid is ‘2121’ • Perform inner JOIN
+
+-- a. Trigger on INSERT operation in Employee
+DELIMITER //
+CREATE TRIGGER AfterEmployeeInsert 
+AFTER INSERT 
+ON Employee
+FOR EACH ROW
+BEGIN
+ INSERT INTO Employee_log (empid, action, action_date) VALUES (NEW.empid, 'INSERT', 
+NOW());
+END //
+DELIMITER ;
+
+-- b. View to show the number of employees in each department
+CREATE VIEW EmpCountPerDept 
+AS
+SELECT dept_id, 
+COUNT(empid) AS employee_count 
+FROM Employee 
+GROUP BY dept_id;
+
+-- c. Modify mobno for employee with empid '2121'
+UPDATE Employee 
+SET mobno = '9898989898' 
+WHERE empid = '2121';
+
+-- d. Perform inner join on Employee and Department
+SELECT e.empid, e.ename, d.dName, d.dlocation
+FROM Employee e
+JOIN Department d 
+ON e.dept_id = d.dept_id;

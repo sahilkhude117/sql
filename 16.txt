@@ -1,0 +1,33 @@
+Student _details=> sid, sname, email, city, semester , course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Create a VIEW using LEFT Join • Show the use of 
+SQL Subquery • Display the instructor name teaching minimum number of courses •
+Modify the course_id as ‘C111’ for the instructor whose ID is ‘0101
+
+-- a. Create VIEW using LEFT JOIN
+CREATE VIEW StudentInstructorView 
+AS
+SELECT s.sid, s.sname, i.Instructor_name 
+FROM Student_details s 
+LEFT JOIN Instructor_info i 
+ON s.course_id = i.course_id;
+
+-- b. Show usage of SQL Subquery
+SELECT * FROM Student_details 
+WHERE sid 
+IN (SELECT sid 
+    FROM Enrollments 
+    WHERE course_id = 'C101');
+
+-- c. Display instructor with minimum courses
+SELECT Instructor_name 
+FROM Instructor_info 
+WHERE course_id = 
+ (SELECT MIN(course_id) 
+  FROM Enrollments 
+  GROUP BY instructor_id);
+
+-- d. Modify course_id to ‘C111’ for instructor with ID ‘0101’
+UPDATE Instructor_info 
+SET course_id = 'C111' 
+WHERE instructor_id = '0101';

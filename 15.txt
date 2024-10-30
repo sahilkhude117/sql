@@ -1,0 +1,28 @@
+Student _details=> sid, sname, email, city, semester , course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Modify the size of column called ‘city’ to 30 
+characters. • Add foreign key to Instructor table • Display students and Instructors names 
+using LEFT Join • Modify the dept_name to ‘EXTC’ for the instructor with id as ‘1001’ •
+Display the number of students coming from the city ‘MUMBAI’
+
+-- a. Modify size of ‘city’ to 30 characters
+ALTER TABLE Student_details 
+MODIFY city VARCHAR(30);
+
+-- b. Display students and instructors using LEFT JOIN
+SELECT s.sname, i.Instructor_name 
+FROM Student_details s 
+LEFT JOIN Instructor_info i 
+ON s.course_id = i.course_id;
+
+-- c. Create VIEW with row/column subset
+CREATE VIEW SubsetView 
+AS
+SELECT column1, column2 
+FROM Student_details 
+WHERE condition;
+
+-- d. Display number of students from ‘MUMBAI’
+SELECT COUNT(*) 
+FROM Student_details 
+WHERE city = 'MUMBAI';

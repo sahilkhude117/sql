@@ -1,0 +1,31 @@
+Student _details=> sid, sname, email, city, semester Instrutcor_info => instructor_id, 
+Instructor_name, dept_name Create two tables as per the given structure and then 
+perform followings • Add column called ‘contact_no’ to Instructor_info table • Write one 
+stored procedure • Display students and Instructors names using INNER Join • Modify the 
+city name to ‘MUMBAI’ for the student with sid as ‘1211’
+
+-- a. Add column ‘contact_no’ to Instructor_info table
+ALTER TABLE Instructor_info 
+ADD COLUMN contact_no VARCHAR(15);
+
+-- b. Define a stored procedure with IN and OUT parameters
+DELIMITER //
+CREATE PROCEDURE GetInstructorDept(IN deptName VARCHAR(50), OUT instructorCount INT)
+BEGIN
+ SELECT COUNT(*) 
+ INTO instructorCount 
+ FROM Instructor_info 
+ WHERE dept_name = deptName;
+END //
+DELIMITER ;
+
+-- c. Display student and instructor names using INNER JOIN
+SELECT s.sname, i.Instructor_name 
+FROM Student_details s 
+INNER JOIN Instructor_info i 
+ON s.course_id = i.course_id;
+
+-- d. Modify city name to ‘MUMBAI’ for student with sid ‘1211’
+UPDATE Student_details 
+SET city = 'MUMBAI' 
+WHERE sid = '1211';

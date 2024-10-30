@@ -1,0 +1,29 @@
+Create one table and perform following operations • Row/Column subset SQL VIEW • A 
+Trigger based on UPDATE operation • Add Primary Key
+
+-- a. Create SQL VIEW with row/column subset
+CREATE VIEW SubsetView 
+AS
+SELECT column1, column2 
+FROM Table 
+WHERE condition;
+
+-- b. Trigger on UPDATE operation
+
+DELIMITER //
+CREATE TRIGGER UpdateTrigger 
+AFTER UPDATE 
+ON Table
+FOR EACH ROW
+BEGIN
+ -- trigger logic here
+END //
+DELIMITER ;
+
+-- c. Add UNIQUE constraint
+ALTER TABLE Table 
+ADD UNIQUE (column_name);
+
+-- d. Use LIKE operator to select records
+SELECT * FROM Table 
+WHERE column_name LIKE '%pattern%';

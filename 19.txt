@@ -1,0 +1,33 @@
+Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching maximum number of courses • Display the 
+course name not assigned to any instructor but students are enrolled. • Modify the 
+course_id as ‘C111’ for the instructor whose ID is ‘0101
+
+-- a. Add new column ‘state’ to Customer
+ALTER TABLE Customer 
+ADD COLUMN state VARCHAR(50);
+
+-- b. Display total amount paid by each customer
+SELECT cust_id, 
+SUM(amtpaid) AS total_paid 
+FROM Order 
+GROUP BY cust_id;
+
+-- c. Trigger on delete operation in Order table
+DELIMITER //
+CREATE TRIGGER LogOrderDeletion 
+AFTER DELETE 
+ON Order
+FOR EACH ROW
+BEGIN
+ INSERT INTO Order_log (order_id, deletion_date) VALUES (OLD.order_id, NOW());
+END //
+DELIMITER ;
+
+-- d. Display cust_ids of those who haven’t placed any order
+SELECT cust_id 
+FROM Customer 
+WHERE cust_id 
+NOT IN (SELECT cust_id FROM Order);

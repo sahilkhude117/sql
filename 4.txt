@@ -1,0 +1,23 @@
+Stud_info => sid, sname, branch, semester, mobno, email Book_info => bid, bname, 
+author, issue_date, sid For the given table structure, execute followings... • Create a VIEW 
+based on SQL JOIN (Inner or Outer) • Display student names starting with “Ra” • Display 
+names of students those who have issued a book with bname as “Programming”. • Modify 
+the author name of the book having bid as ‘BK11001’ to ‘Henry J.’
+
+-- Stored procedure to fetch student by name
+DELIMITER //
+CREATE PROCEDURE GetStudentByName(IN sname VARCHAR(50))
+BEGIN
+ SELECT * FROM Stud_info WHERE sname = sname;
+END //
+DELIMITER ;
+
+-- Students whose names start with "Ra"
+SELECT sname 
+FROM Stud_info 
+WHERE sname LIKE 'Ra%';
+
+-- Modify author name
+UPDATE Book_info 
+SET author = 'Henry J.' 
+WHERE bid = 'BK11001';

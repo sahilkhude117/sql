@@ -1,0 +1,615 @@
+1. Passenger => (pid, pname, mobno, email, city) Flight_info=> (fid, src, desti, date, amtpaid, 
+pid ) Create two tables as per given structure and execute followings.. • Modify flight id to 
+‘AIR1005’ of a flighthaving fid as ‘AIR1002’. • Display the total count of passengers for each 
+flight • Write a stored procedure to display passenger record whose ID is ‘P1122’. • Display 
+the passenger name and amount paid by each.
+-- Create Passenger and Flight_info tables
+CREATE TABLE Passenger (
+ PID VARCHAR(10) PRIMARY KEY,
+ pname VARCHAR(50),
+ mobno VARCHAR(15),
+ email VARCHAR(50),
+ city VARCHAR(50)
+);
+CREATE TABLE Flight_info (
+ FID VARCHAR(10) PRIMARY KEY,
+ Source VARCHAR(50),
+ Destination VARCHAR(50),
+ JDate DATE,
+ AmtPaid DECIMAL(10, 2),
+ PID VARCHAR(10),
+ FOREIGN KEY (PID) REFERENCES Passenger(PID)
+);
+-- Modify flight id
+UPDATE Flight_info SET FID = 'AIR1005' WHERE FID = 'AIR1002';
+-- Display total passenger count per flight
+SELECT FID, COUNT(PID) AS passenger_count FROM Flight_info GROUP BY FID;
+-- Stored procedure to display a passenger record
+DELIMITER //
+CREATE PROCEDURE GetPassengerByID(IN pID VARCHAR(10))
+BEGIN
+ SELECT * FROM Passenger WHERE PID = pID;
+END //
+DELIMITER ;
+-- Display passenger names and amounts paid
+SELECT pname, AmtPaid FROM Passenger JOIN Flight_info ON Passenger.PID = Flight_info.PID;
+
+
+
+2. 2. Customer => (cust_id, cust_name, mobno, email, city) Order => (order_id, product_type, 
+delivery_date, status, amtpaid, cust_id). Create two tables as per given structure and 
+execute followings.. a. Add new column to customer called ‘state’. b. Display the total 
+amount paid by each customer. c. Write a Trigger based on delete operation on Order 
+table. d. Display cust_ids of those who haven’t placed any order.
+-- Create Customer and Order tables
+CREATE TABLE Customer (
+ cust_id VARCHAR(10) PRIMARY KEY,
+ cust_name VARCHAR(50),
+ mobno VARCHAR(15),
+ email VARCHAR(50),
+ city VARCHAR(50)
+);
+CREATE TABLE Order (
+ order_id VARCHAR(10) PRIMARY KEY,
+ product_type VARCHAR(50),
+ delivery_date DATE,
+ status VARCHAR(20),
+ amtpaid DECIMAL(10, 2),
+ cust_id VARCHAR(10),
+ FOREIGN KEY (cust_id) REFERENCES Customer(cust_id)
+);
+-- Add 'state' column to Customer
+ALTER TABLE Customer ADD COLUMN state VARCHAR(50);
+-- Display total amount paid per customer
+SELECT cust_id, SUM(amtpaid) AS total_paid FROM Order GROUP BY cust_id;
+-- Trigger on DELETE operation in Order
+DELIMITER //
+CREATE TRIGGER OrderDelete AFTER DELETE ON Order
+FOR EACH ROW
+BEGIN
+ INSERT INTO Order_log (order_id, delete_date) VALUES (OLD.order_id, NOW());
+END //
+DELIMITER ;
+-- Display customers without orders
+SELECT cust_id FROM Customer WHERE cust_id NOT IN (SELECT cust_id FROM Order);
+
+
+3. Customer => (cust_id, cust_name, mobno, email, city) Order => (order_id, product_type, 
+delivery_date, status, amtpaid, cust_id) Create two tables as per given structure and 
+execute followings.. • A Trigger to maintain LOG based on DELETE operation on order 
+table. • Display the names of all the customers whose email has ‘a’ as second letter. •
+Display cust_ids of those who haven’t placed any order. • Apply 5% discount on ‘amtpaid’ 
+for all customers
+-- Trigger to log deletions
+DELIMITER //
+CREATE TRIGGER LogDeletion AFTER DELETE ON Order
+FOR EACH ROW
+BEGIN
+ INSERT INTO Order_log (order_id, deleted_at) VALUES (OLD.order_id, NOW());
+END //
+DELIMITER ;
+-- Customer email with 'a' as second letter
+SELECT cust_name FROM Customer WHERE email LIKE '_a%';
+-- 5% discount on amtpaid
+UPDATE Order SET amtpaid = amtpaid * 0.95;
+
+
+4. Stud_info => sid, sname, branch, semester, mobno, email Book_info => bid, bname, 
+author, issue_date, sid For the given table structure, execute followings... • Create a VIEW 
+based on SQL JOIN (Inner or Outer) • Display student names starting with “Ra” • Display 
+names of students those who have issued a book with bname as “Programming”. • Modify 
+the author name of the book having bid as ‘BK11001’ to ‘Henry J.’
+-- Stored procedure to fetch student by name
+DELIMITER //
+CREATE PROCEDURE GetStudentByName(IN sname VARCHAR(50))
+BEGIN
+ SELECT * FROM Stud_info WHERE sname = sname;
+END //
+DELIMITER ;
+-- Students whose names start with "Ra"
+SELECT sname FROM Stud_info WHERE sname LIKE 'Ra%';
+-- Modify author name
+UPDATE Book_info SET author = 'Henry J.' WHERE bid = 'BK11001';
+
+
+5. Customer_details => cid, cname, mobno, email, city Account_info => Ac_no, Ac_type, 
+Balance, branch_name, cid For the given table structure, execute followings.. • Type of 
+accounts opened by customer ‘Ajay’ • Display balance after sdding 7% interest to all 
+accounts • One SQL subquery • A VIEW to show total balance amount as per branch
+-- Display account type by customer name
+SELECT Ac_type FROM Account_info JOIN Customer_details ON Account_info.cid = 
+Customer_details.cid WHERE cname = 'Ajay';
+-- Display balance with 7% interest
+SELECT Balance * 1.07 AS NewBalance FROM Account_info;
+-- View for total balance per branch
+CREATE VIEW TotalBalancePerBranch AS SELECT branch_name, SUM(Balance) AS 
+TotalBalance FROM Account_info GROUP BY branch_name;
+
+
+6. Table : employee => empid, ename, designation, mobno, email, city, dept_id, For the given 
+table structure, execute followings.. • Create a Trigger based on Insert operation • A VIEW 
+to show the number of employees in each department. • Modify mobno to ‘9898989898’ 
+for the employee whose empid is ‘2121’ • Perform inner JOIN
+-- a. Trigger on INSERT operation in Employee
+DELIMITER //
+CREATE TRIGGER AfterEmployeeInsert AFTER INSERT ON Employee
+FOR EACH ROW
+BEGIN
+ INSERT INTO Employee_log (empid, action, action_date) VALUES (NEW.empid, 'INSERT', 
+NOW());
+END //
+DELIMITER ;
+-- b. View to show the number of employees in each department
+CREATE VIEW EmpCountPerDept AS
+SELECT dept_id, COUNT(empid) AS employee_count FROM Employee GROUP BY dept_id;
+-- c. Modify mobno for employee with empid '2121'
+UPDATE Employee SET mobno = '9898989898' WHERE empid = '2121';
+-- d. Perform inner join on Employee and Department
+SELECT e.empid, e.ename, d.dName, d.dlocation
+FROM Employee e
+JOIN Department d ON e.dept_id = d.dept_id;
+
+
+7. Table : employee => empid, ename, designation, mobno, email, city, dept_id, For the given 
+table structure, execute followings.. • Create a Trigger based on Delete operation • A VIEW 
+to show the number of employees coming from same city. • Display employee names 
+having ‘h’ as last alphabet. • Show the use of SQL subquery
+-- a. Display all records using JDBC connection
+// JDBC code is similar to previous example but for `Employee` table
+-- b. View to show the number of employees from the same city
+CREATE VIEW EmpCountByCity AS
+SELECT city, COUNT(empid) AS employee_count FROM Employee GROUP BY city;
+-- c. Display employee names with ‘h’ as last alphabet
+SELECT ename FROM Employee WHERE ename LIKE '%h';
+-- d. Modify datatype of a column
+ALTER TABLE Employee MODIFY COLUMN mobno BIGINT;
+
+
+8. Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total For the given table structure, execute followings... • A Trigger to add total marks for 
+each student while inserting a new record. • Display the average, minimum and maximum 
+marks scored in subj3 • A VIEW to show number of students as per branch.
+-- a. Trigger to add total marks when inserting new record
+DELIMITER //
+CREATE TRIGGER AddTotalMarks BEFORE INSERT ON Stud_marks
+FOR EACH ROW
+BEGIN
+ SET NEW.total = NEW.sbj1_mark + NEW.sbj2_mark + NEW.sbj3_mark + NEW.sbj4_mark;
+END //
+DELIMITER ;
+-- b. Display average, minimum, maximum marks in sbj3
+SELECT AVG(sbj3_mark) AS avg_mark, MIN(sbj3_mark) AS min_mark, MAX(sbj3_mark) AS 
+max_mark FROM Stud_marks;
+-- c. Display number of students per branch
+SELECT branch, COUNT(sid) AS student_count FROM Stud_marks GROUP BY branch;
+-- d. Set default value for branch as ‘IT’
+ALTER TABLE Stud_marks MODIFY branch VARCHAR(50) DEFAULT 'IT';
+
+
+9. Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • Group By with Having •
+Display the name of students scoring less than the average marks in subj1. • A Trigger 
+based on DELETE operation performed on stud_marks.
+-- a. VIEW showing the number of students per branch
+CREATE VIEW StudentCountByBranch AS
+SELECT branch, COUNT(sid) AS student_count FROM Stud_marks GROUP BY branch;
+-- b. Add 2% extra marks for students scoring less than 40 in sbj2
+UPDATE Stud_marks SET sbj2_mark = sbj2_mark * 1.02 WHERE sbj2_mark < 40;
+-- c. Display students scoring more than average in sbj4
+SELECT sname FROM Stud_marks WHERE sbj4_mark > (SELECT AVG(sbj4_mark) FROM 
+Stud_marks);
+-- d. Modify branch to ‘EXTC’ for student with id ‘2001’
+UPDATE Stud_marks SET branch = 'EXTC' WHERE sid = '2001';
+
+
+10. Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • A VIEW to show number 
+of students as per branch. • Add 2% extra marks to all students scoring less than 40 in 
+subj2. • Display the name of students scoring more than average marks in subj4. • Modify 
+the branch to ‘EXTC’ for the student with id as ‘2001’
+-- a. VIEW showing the number of students per branch
+CREATE VIEW StudentCountByBranch AS
+SELECT branch, COUNT(sid) AS student_count FROM Stud_marks GROUP BY branch;
+-- b. Add 2% extra marks for students scoring less than 40 in sbj2
+UPDATE Stud_marks SET sbj2_mark = sbj2_mark * 1.02 WHERE sbj2_mark < 40;
+-- c. Display students scoring more than average in sbj4
+SELECT sname FROM Stud_marks WHERE sbj4_mark > (SELECT AVG(sbj4_mark) FROM 
+Stud_marks);
+-- d. Modify branch to ‘EXTC’ for student with id ‘2001’
+UPDATE Stud_marks SET branch = 'EXTC' WHERE sid = '2001';
+
+
+11. Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching maximum number of courses • Display the 
+course name not assigned to any instructor but students are enrolled. • Modify the 
+course_id as ‘C111’ for the instructor whose ID is ‘0101’
+-- a. Display the number of students enrolled per course
+SELECT course_id, COUNT(sid) AS student_count FROM Student_details GROUP BY course_id;
+-- b. Display instructor with maximum courses
+SELECT Instructor_name FROM Instructor_info WHERE course_id = (
+ SELECT course_id FROM Student_details GROUP BY course_id ORDER BY COUNT(sid) DESC LIMIT 1
+);
+-- c. Set default value for semester as ‘Sem III’
+ALTER TABLE Student_details MODIFY semester VARCHAR(20) DEFAULT 'Sem III';
+-- d. Modify course_id to ‘C111’ for instructor with ID ‘0101’
+UPDATE Instructor_info SET course_id = 'C111' WHERE instructor_id = '0101';
+
+
+12. Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching maximum number of courses • Display the 
+course name not assigned to any instructor but students are enrolled. • Create a ‘Group 
+By’ view using one of the tables.
+-- a. Display students per course
+SELECT course_id, COUNT(sid) AS student_count FROM Student_details GROUP BY 
+course_id;
+-- b. Display instructor with maximum courses
+SELECT Instructor_name FROM Instructor_info WHERE course_id = (
+ SELECT course_id FROM Student_details GROUP BY course_id ORDER BY COUNT(sid) DESC 
+LIMIT 1
+);
+-- c. JDBC connection code to display all records from Student_details table
+-- d. Display instructor teaching ‘XYZ’ course to student ‘MNO’
+SELECT Instructor_name FROM Instructor_info WHERE course_id = 
+ (SELECT course_id FROM Student_details WHERE sname = 'MNO' AND course_id = 'XYZ');
+
+
+13. Create one table and perform following operations • Row/Column subset SQL VIEW • A 
+Trigger based on UPDATE operation • Add Primary Key
+-- a. Create SQL VIEW with row/column subset
+CREATE VIEW SubsetView AS
+SELECT column1, column2 FROM Table WHERE condition;
+-- b. Trigger on UPDATE operation
+DELIMITER //
+CREATE TRIGGER UpdateTrigger AFTER UPDATE ON Table
+FOR EACH ROW
+BEGIN
+ -- trigger logic here
+END //
+DELIMITER ;
+-- c. Add UNIQUE constraint
+ALTER TABLE Table ADD UNIQUE (column_name);
+-- d. Use LIKE operator to select records
+SELECT * FROM Table WHERE column_name LIKE '%pattern%';
+
+
+14. Student _details=> sid, sname, email, city, semester Instrutcor_info => instructor_id, 
+Instructor_name, dept_name. Create two tables as per the given structure and then 
+perform followings • Add column called ‘contact_no’ to Instructor_info table • Write one 
+stored procedure • Display students and Instructors names using INNER Join • Modify the 
+city name to ‘MUMBAI’ for the student with sid as ‘1211’
+-- a. Add ‘contact_no’ to Instructor_info
+ALTER TABLE Instructor_info ADD COLUMN contact_no VARCHAR(15);
+-- b. Define and execute stored procedure with IN parameter
+DELIMITER //
+CREATE PROCEDURE DisplayByCity(IN cityName VARCHAR(50))
+BEGIN
+ SELECT * FROM Student_details WHERE city = cityName;
+END //
+DELIMITER ;
+-- c. Display students and instructors using INNER JOIN
+SELECT s.sname, i.Instructor_name FROM Student_details s INNER JOIN Instructor_info i ON 
+s.course_id = i.course_id;
+-- d. Modify city name to ‘MUMBAI’ for student with sid ‘1211’
+UPDATE Student_details SET city = 'MUMBAI' WHERE sid = '1211';
+
+
+15. Student _details=> sid, sname, email, city, semester , course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Modify the size of column called ‘city’ to 30 
+characters. • Add foreign key to Instructor table • Display students and Instructors names 
+using LEFT Join • Modify the dept_name to ‘EXTC’ for the instructor with id as ‘1001’ •
+Display the number of students coming from the city ‘MUMBAI’
+-- a. Modify size of ‘city’ to 30 characters
+ALTER TABLE Student_details MODIFY city VARCHAR(30);
+-- b. Display students and instructors using LEFT JOIN
+SELECT s.sname, i.Instructor_name FROM Student_details s LEFT JOIN Instructor_info i ON 
+s.course_id = i.course_id;
+-- c. Create VIEW with row/column subset
+CREATE VIEW SubsetView AS
+SELECT column1, column2 FROM Student_details WHERE condition;
+-- d. Display number of students from ‘MUMBAI’
+SELECT COUNT(*) FROM Student_details WHERE city = 'MUMBAI';
+
+
+16. Student _details=> sid, sname, email, city, semester , course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Create a VIEW using LEFT Join • Show the use of 
+SQL Subquery • Display the instructor name teaching minimum number of courses •
+Modify the course_id as ‘C111’ for the instructor whose ID is ‘0101
+-- a. Create VIEW using LEFT JOIN
+CREATE VIEW StudentInstructorView AS
+SELECT s.sid, s.sname, i.Instructor_name 
+FROM Student_details s LEFT JOIN Instructor_info i ON s.course_id = i.course_id;
+-- b. Show usage of SQL Subquery
+SELECT * FROM Student_details WHERE sid IN (SELECT sid FROM Enrollments WHERE 
+course_id = 'C101');
+-- c. Display instructor with minimum courses
+SELECT Instructor_name FROM Instructor_info WHERE course_id = 
+ (SELECT MIN(course_id) FROM Enrollments GROUP BY instructor_id);
+-- d. Modify course_id to ‘C111’ for instructor with ID ‘0101’
+UPDATE Instructor_info SET course_id = 'C111' WHERE instructor_id = '0101';
+
+
+17. For the student table (sid, sname, branch, age, mobno, city) write SQL statement: • Create 
+a SQL stored procedure using IN and OUT parameter • Modify the city name to ‘MUMBAI’ 
+for the student with sid as ‘1211’ • Show the use of Group By with Having • Drop Primary 
+Key
+-- a. Stored procedure using IN and OUT parameters
+DELIMITER //
+CREATE PROCEDURE GetStudentDetails(IN studentID VARCHAR(10), OUT studentName 
+VARCHAR(50))
+BEGIN
+ SELECT sname INTO studentName FROM Student_info WHERE sid = studentID;
+END //
+DELIMITER ;
+-- b. Modify city name to ‘MUMBAI’ for student with sid ‘1211’
+UPDATE Student_info SET city = 'MUMBAI' WHERE sid = '1211';
+-- c. Use GROUP BY with HAVING
+SELECT city, COUNT(sid) AS student_count FROM Student_info GROUP BY city HAVING 
+student_count > 1;
+-- d. Drop primary key
+ALTER TABLE Student_info DROP PRIMARY KEY;
+
+
+18. Consider an appropriate TABLE to perform followings • SQL Trigger using IF ELSE 
+programming construct for grading students’ performance • Display information using 
+Subquery • Rename a Table
+-- a. Trigger using IF ELSE construct
+DELIMITER //
+CREATE TRIGGER CheckInsert BEFORE INSERT ON ExampleTable
+FOR EACH ROW
+BEGIN
+ IF NEW.amount > 1000 THEN
+ SET NEW.status = 'High';
+ ELSE
+ SET NEW.status = 'Low';
+ END IF;
+END //
+DELIMITER ;
+-- b. Display information using Subquery
+SELECT * FROM ExampleTable WHERE id IN (SELECT id FROM AnotherTable WHERE condition);
+-- c. Rename a column
+ALTER TABLE ExampleTable RENAME COLUMN old_column_name TO new_column_name;
+
+
+19. Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching maximum number of courses • Display the 
+course name not assigned to any instructor but students are enrolled. • Modify the 
+course_id as ‘C111’ for the instructor whose ID is ‘0101
+-- a. Add new column ‘state’ to Customer
+ALTER TABLE Customer ADD COLUMN state VARCHAR(50);
+-- b. Display total amount paid by each customer
+SELECT cust_id, SUM(amtpaid) AS total_paid FROM Order GROUP BY cust_id;
+-- c. Trigger on delete operation in Order table
+DELIMITER //
+CREATE TRIGGER LogOrderDeletion AFTER DELETE ON Order
+FOR EACH ROW
+BEGIN
+ INSERT INTO Order_log (order_id, deletion_date) VALUES (OLD.order_id, NOW());
+END //
+DELIMITER ;
+-- d. Display cust_ids of those who haven’t placed any order
+SELECT cust_id FROM Customer WHERE cust_id NOT IN (SELECT cust_id FROM Order);
+
+
+20. Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching minimum number of courses • Group 
+instructors based on courses • Drop ‘city’ column from Student_details table
+-- a. Modify flight id to ‘AIR1005’ for flight with fid ‘AIR1002’
+UPDATE Flight_info SET FID = 'AIR1005' WHERE FID = 'AIR1002';
+-- b. Display total count of passengers per flight
+SELECT FID, COUNT(PID) AS passenger_count FROM Flight_info GROUP BY FID;
+-- c. Stored procedure to display passenger record with ID ‘P1122’
+DELIMITER //
+CREATE PROCEDURE GetPassengerByID(IN pID VARCHAR(10))
+BEGIN
+ SELECT * FROM Passenger WHERE PID = pID;
+END //
+DELIMITER ;
+-- d. Display passenger name and amount paid by each
+SELECT pname, AmtPaid FROM Passenger JOIN Flight_info ON Passenger.PID = 
+Flight_info.PID;
+
+
+21. Create tables and perform following operations • Group BY based SQL VIEW • SQL INNER 
+Join • Add a new column to the table
+-- a. Group BY-based SQL VIEW
+CREATE VIEW StudentBranchView AS
+SELECT branch, COUNT(sid) AS student_count FROM Stud_info GROUP BY branch;
+-- b. SQL INNER Join to fetch matching records
+SELECT s.sid, s.sname, b.bname FROM Stud_info s INNER JOIN Book_info b ON s.sid = b.sid;
+-- c. Add a new column to the table
+ALTER TABLE Stud_info ADD COLUMN grade VARCHAR(5);
+-- d. Display records using BETWEEN operator
+SELECT * FROM Stud_info WHERE semester BETWEEN 1 AND 4;
+
+
+22. Student _details=> sid, sname, email, city, semester Instrutcor_info => instructor_id, 
+Instructor_name, dept_name Create two tables as per the given structure and then 
+perform followings • Add column called ‘contact_no’ to Instructor_info table • Write one 
+stored procedure • Display students and Instructors names using INNER Join • Modify the 
+city name to ‘MUMBAI’ for the student with sid as ‘1211’
+-- a. Create a VIEW based on SQL JOIN (Inner or Outer)
+CREATE VIEW StudentBookView AS
+SELECT s.sid, s.sname, b.bname FROM Stud_info s LEFT JOIN Book_info b ON s.sid = b.sid;
+-- b. Display student names starting with “Ra”
+SELECT sname FROM Stud_info WHERE sname LIKE 'Ra%';
+-- c. Display names of students who have issued a book with bname as “Programming”
+SELECT sname FROM Stud_info JOIN Book_info ON Stud_info.sid = Book_info.sid WHERE 
+bname = 'Programming';
+-- d. Perform Group By with Having
+SELECT branch, COUNT(sid) AS student_count FROM Stud_info GROUP BY branch HAVING 
+student_count > 2;
+
+
+23. Table : employee => empid, ename, designation, mobno, email, city, dept_id, For the 
+given table structure, execute followings.. • Create a Trigger based on Delete operation • A 
+VIEW to show the number of employees coming from same city. • Display employee 
+names having ‘h’ as last alphabet. • Show the use of SQL subquery
+-- a. Create a trigger on DELETE or UPDATE operation
+DELIMITER //
+CREATE TRIGGER EmployeeUpdateDelete BEFORE DELETE ON Employee
+FOR EACH ROW
+BEGIN
+ INSERT INTO Employee_log (empid, action, action_date) VALUES (OLD.empid, 'DELETE', 
+NOW());
+END //
+DELIMITER ;
+-- b. View to show employees from the same city
+CREATE VIEW EmpCityCount AS
+SELECT city, COUNT(empid) AS employee_count FROM Employee GROUP BY city;
+-- c. Display employee names with ‘h’ as last alphabet
+SELECT ename FROM Employee WHERE ename LIKE '%h';
+-- d. Change the designation of an employee with empid ‘1101’
+UPDATE Employee SET designation = 'Manager' WHERE empid = '1101';
+
+
+24. Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total For the given table structure, execute followings... • A Trigger to add total marks for 
+each student while inserting a new record. • Display the average, minimum and maximum 
+marks scored in subj3 • A VIEW to show number of students as per branch.
+-- a. Trigger to add total marks on inserting a new record
+DELIMITER //
+CREATE TRIGGER AddTotalMarks BEFORE INSERT ON Stud_marks
+FOR EACH ROW
+BEGIN
+ SET NEW.total = NEW.sbj1_mark + NEW.sbj2_mark + NEW.sbj3_mark + NEW.sbj4_mark;
+END //
+DELIMITER ;
+-- b. Display average, minimum, maximum marks in sbj3
+SELECT AVG(sbj3_mark) AS avg_mark, MIN(sbj3_mark) AS min_mark, MAX(sbj3_mark) AS 
+max_mark FROM Stud_marks;
+-- c. Display names of students scoring less than average in sbj4
+SELECT sname FROM Stud_marks WHERE sbj4_mark < (SELECT AVG(sbj4_mark) FROM 
+Stud_marks);
+
+
+25. Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • List student names having 
+‘a’ as last alphabet in their names. • Display the name of students scoring less than the 
+average marks in subj1. • A Trigger based on DELETE operation performed on stud_marks.
+-- a. List student names with ‘a’ as the last alphabet
+SELECT sname FROM Stud_marks WHERE sname LIKE '%a';
+-- b. Display names of students scoring less than average in sbj1
+SELECT sname FROM Stud_marks WHERE sbj1_mark < (SELECT AVG(sbj1_mark) FROM 
+Stud_marks);
+-- c. Stored procedure to display students from a specific branch
+DELIMITER //
+CREATE PROCEDURE GetStudentsByBranch(IN branchName VARCHAR(50))
+BEGIN
+ SELECT * FROM Stud_marks WHERE branch = branchName;
+END //
+DELIMITER ;
+-- d. Add new column Grade
+ALTER TABLE Stud_marks ADD COLUMN grade VARCHAR(5);
+
+
+26. Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • A VIEW to show number 
+of students as per branch. • Apply 2% extra marks to all students scoring less than 40 in 
+subj2. • Display the name of students scoring more than average marks in subj4. • Modify 
+the branch to ‘EXTC’ for the student with id as ‘2001’
+-- a. VIEW to show number of students per branch
+CREATE VIEW StudentCountByBranch AS
+SELECT branch, COUNT(sid) AS student_count FROM Stud_marks GROUP BY branch;
+-- b. Apply 2% extra marks for students scoring below 40 in sbj2
+UPDATE Stud_marks SET sbj2_mark = sbj2_mark * 1.02 WHERE sbj2_mark < 40;
+-- c. Stored procedure to display students with sbj3 marks less than a given value
+DELIMITER //
+CREATE PROCEDURE GetStudentsBySbj3Mark(IN mark INT)
+BEGIN
+ SELECT * FROM Stud_marks WHERE sbj3_mark < mark;
+END //
+DELIMITER ;
+-- d. Modify branch to ‘EXTC’ for student with sid ‘2001’
+UPDATE Stud_marks SET branch = 'EXTC' WHERE sid = '2001';
+
+
+27. Stud_info => sid, sname, branch, semester, mobno, email Book_info => bid, bname, 
+author, issue_date, sid 27. For the given table structure, execute followings... • Create a 
+VIEW based on SQL JOIN (Inner or Outer) • Display student names starting with “Ra” •
+Display names of students those who have issued a book with bname as “Programming”. •
+Modify the author name of the book having bid as ‘BK11001’ to ‘Henry J.’
+-- a. Create VIEW using JOIN (Inner or Outer)
+CREATE VIEW StudentBookView AS
+SELECT s.sid, s.sname, b.bname FROM Stud_info s INNER JOIN Book_info b ON s.sid = b.sid;
+-- b. Define stored procedure with OUT parameter
+DELIMITER //
+CREATE PROCEDURE GetStudentBranch(IN sid VARCHAR(10), OUT branchName 
+VARCHAR(50))
+BEGIN
+ SELECT branch INTO branchName FROM Stud_info WHERE sid = sid;
+END //
+DELIMITER ;
+-- c. Display students who issued book named “Programming”
+SELECT sname FROM Stud_info JOIN Book_info ON Stud_info.sid = Book_info.sid WHERE 
+bname = 'Programming';
+-- d. Modify author name to ‘Henry J.’ for book with bid ‘BK111’
+UPDATE Book_info SET author = 'Henry J.' WHERE bid = 'BK111';
+
+
+28. Customer_details => cid, cname, mobno, email, city Account_info => Ac_no, Ac_type, 
+Balance, branch_name, cid For the given table structure, execute followings.. • Type of 
+accounts opened by customer ‘Ajay’ • Add 7% interest to all accounts • Show the use of 
+SQL subquery • A VIEW to show total balance amount as per branch
+-- a. Display account type by customer ‘Ajay’
+SELECT Ac_type FROM Account_info JOIN Customer_details ON Account_info.cid = 
+Customer_details.cid WHERE cname = 'Ajay';
+-- b. Display account Balance with 7% interest
+SELECT Balance * 1.07 AS UpdatedBalance FROM Account_info;
+-- c. Use SQL subquery
+SELECT * FROM Account_info WHERE Balance > (SELECT AVG(Balance) FROM Account_info);
+-- d. View showing total balance by branch
+CREATE VIEW BranchBalance AS
+SELECT branch_name, SUM(Balance) AS TotalBalance FROM Account_info GROUP BY 
+branch_name;
+
+
+29. Student _details=> sid, sname, email, city, semester Instrutcor_info => instructor_id, 
+Instructor_name, dept_name Create two tables as per the given structure and then 
+perform followings • Add column called ‘contact_no’ to Instructor_info table • Write one 
+stored procedure • Display students and Instructors names using INNER Join • Modify the 
+city name to ‘MUMBAI’ for the student with sid as ‘1211’
+-- a. Add column ‘contact_no’ to Instructor_info table
+ALTER TABLE Instructor_info ADD COLUMN contact_no VARCHAR(15);
+-- b. Define a stored procedure with IN and OUT parameters
+DELIMITER //
+CREATE PROCEDURE GetInstructorDept(IN deptName VARCHAR(50), OUT instructorCount 
+INT)
+BEGIN
+ SELECT COUNT(*) INTO instructorCount FROM Instructor_info WHERE dept_name = 
+deptName;
+END //
+DELIMITER ;
+-- c. Display student and instructor names using INNER JOIN
+SELECT s.sname, i.Instructor_name 
+FROM Student_details s 
+INNER JOIN Instructor_info i ON s.course_id = i.course_id;
+-- d. Modify city name to ‘MUMBAI’ for student with sid ‘1211’
+UPDATE Student_details SET city = 'MUMBAI' WHERE sid = '1211';
+
+
+30. Student _details=> sid, sname, email, city, semester , course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Modify the size of column called ‘city’ to 30 
+characters. • Add foreign key to Instructor table • Display students and Instructors names 
+using LEFT Join • Modify the dept_name to ‘EXTC’ for the instructor with id as ‘1001’ •
+Display the number of students coming from the city ‘MUMBAI
+-- a. Modify the size of ‘city’ column to 30 characters
+ALTER TABLE Student_details MODIFY city VARCHAR(30);
+-- b. Perform RIGHT OUTER JOIN
+SELECT s.sname, i.Instructor_name 
+FROM Student_details s 
+RIGHT JOIN Instructor_info i ON s.course_id = i.course_id;
+-- c. Display all records from Student_details using JDBC connection
+// Sample JDBC code to retrieve records from Student_details
+-- d. Display number of students coming from the city ‘MUMBAI’
+SELECT COUNT(*) AS mumbai_students FROM Student_details WHERE city = 'MUMBAI';

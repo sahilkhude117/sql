@@ -1,0 +1,33 @@
+Student _details=> sid, sname, email, city, semester, course_id Instrutcor_info => 
+instructor_id, Instructor_name, dept_name, course_id Create two tables as per the given 
+structure and then perform followings • Display number of students enrolled for each 
+course. • Display the instructor name teaching maximum number of courses • Display the 
+course name not assigned to any instructor but students are enrolled. • Create a ‘Group 
+By’ view using one of the tables.
+
+-- a. Display students per course
+SELECT course_id, 
+COUNT(sid) AS student_count 
+FROM Student_details 
+GROUP BY course_id;
+
+-- b. Display instructor with maximum courses
+SELECT Instructor_name 
+FROM Instructor_info 
+WHERE course_id = (
+ SELECT course_id 
+ FROM Student_details 
+ GROUP BY course_id ORDER BY 
+ COUNT(sid) DESC LIMIT 1
+);
+
+-- c. JDBC connection code to display all records from Student_details table
+
+-- d. Display instructor teaching ‘XYZ’ course to student ‘MNO’
+SELECT Instructor_name 
+FROM Instructor_info 
+WHERE course_id = 
+ (SELECT course_id 
+  FROM Student_details 
+  WHERE sname = 'MNO' 
+  AND course_id = 'XYZ');

@@ -1,0 +1,31 @@
+Stud_marks => sid, sname, branch, sem, sbj1_mark, sbj2_mark, sbj3_mark, sbj4_mark, 
+total_marks For the given table structure, execute followings... • A VIEW to show number 
+of students as per branch. • Apply 2% extra marks to all students scoring less than 40 in 
+subj2. • Display the name of students scoring more than average marks in subj4. • Modify 
+the branch to ‘EXTC’ for the student with id as ‘2001’
+
+-- a. VIEW to show number of students per branch
+CREATE VIEW StudentCountByBranch 
+AS
+SELECT branch, 
+COUNT(sid) AS student_count 
+FROM Stud_marks 
+GROUP BY branch;
+
+-- b. Apply 2% extra marks for students scoring below 40 in sbj2
+UPDATE Stud_marks 
+SET sbj2_mark = sbj2_mark * 1.02 
+WHERE sbj2_mark < 40;
+
+-- c. Stored procedure to display students with sbj3 marks less than a given value
+DELIMITER //
+CREATE PROCEDURE GetStudentsBySbj3Mark(IN mark INT)
+BEGIN
+ SELECT * FROM Stud_marks WHERE sbj3_mark < mark;
+END //
+DELIMITER ;
+
+-- d. Modify branch to ‘EXTC’ for student with sid ‘2001’
+UPDATE Stud_marks 
+SET branch = 'EXTC' 
+WHERE sid = '2001';

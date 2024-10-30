@@ -1,0 +1,50 @@
+. Customer => (cust_id, cust_name, mobno, email, city) Order => (order_id, product_type, 
+delivery_date, status, amtpaid, cust_id). Create two tables as per given structure and 
+execute followings.. a. Add new column to customer called ‘state’. b. Display the total 
+amount paid by each customer. c. Write a Trigger based on delete operation on Order 
+table. d. Display cust_ids of those who haven’t placed any order.
+
+-- Create Customer and Order tables
+CREATE TABLE Customer (
+ cust_id VARCHAR(10) PRIMARY KEY,
+ cust_name VARCHAR(50),
+ mobno VARCHAR(15),
+ email VARCHAR(50),
+ city VARCHAR(50)
+);
+
+CREATE TABLE Order (
+ order_id VARCHAR(10) PRIMARY KEY,
+ product_type VARCHAR(50),
+ delivery_date DATE,
+ status VARCHAR(20),
+ amtpaid DECIMAL(10, 2),
+ cust_id VARCHAR(10),
+ FOREIGN KEY (cust_id) REFERENCES Customer(cust_id)
+);
+
+-- Add 'state' column to Customer
+ALTER TABLE Customer 
+ADD COLUMN state VARCHAR(50);
+
+-- Display total amount paid per customer
+SELECT cust_id, 
+SUM(amtpaid) AS total_paid 
+FROM Order 
+GROUP BY cust_id;
+
+-- Trigger on DELETE operation in Order
+DELIMITER //
+CREATE TRIGGER OrderDelete 
+AFTER DELETE 
+ON Order
+FOR EACH ROW
+BEGIN
+ INSERT INTO Order_log (order_id, delete_date) VALUES (OLD.order_id, NOW());
+END //
+DELIMITER ;
+
+-- Display customers without orders
+SELECT cust_id 
+FROM Customer 
+WHERE cust_id NOT IN (SELECT cust_id FROM Order);

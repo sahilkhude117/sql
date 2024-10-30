@@ -1,0 +1,33 @@
+Student _details=> sid, sname, email, city, semester Instrutcor_info => instructor_id, 
+Instructor_name, dept_name Create two tables as per the given structure and then 
+perform followings • Add column called ‘contact_no’ to Instructor_info table • Write one 
+stored procedure • Display students and Instructors names using INNER Join • Modify the 
+city name to ‘MUMBAI’ for the student with sid as ‘1211’
+
+-- a. Create a VIEW based on SQL JOIN (Inner or Outer)
+CREATE VIEW StudentBookView 
+AS
+SELECT s.sid, s.sname, b.bname 
+FROM Stud_info s 
+LEFT JOIN Book_info b 
+ON s.sid = b.sid;
+
+-- b. Display student names starting with “Ra”
+SELECT sname 
+FROM Stud_info 
+WHERE sname LIKE 'Ra%';
+
+-- c. Display names of students who have issued a book with bname as “Programming”
+SELECT sname 
+FROM Stud_info 
+JOIN Book_info 
+ON Stud_info.sid = Book_info.sid 
+WHERE 
+bname = 'Programming';
+
+-- d. Perform Group By with Having
+SELECT branch, 
+COUNT(sid) AS student_count 
+FROM Stud_info 
+GROUP BY branch 
+HAVING student_count > 2;

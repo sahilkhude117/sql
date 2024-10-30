@@ -1,0 +1,24 @@
+Table : employee => empid, ename, designation, mobno, email, city, dept_id, For the given 
+table structure, execute followings.. • Create a Trigger based on Delete operation • A VIEW 
+to show the number of employees coming from same city. • Display employee names 
+having ‘h’ as last alphabet. • Show the use of SQL subquery
+
+-- a. Display all records using JDBC connection
+// JDBC code is similar to previous example but for `Employee` table
+
+-- b. View to show the number of employees from the same city
+CREATE VIEW EmpCountByCity 
+AS
+SELECT city, 
+COUNT(empid) AS employee_count 
+FROM Employee 
+GROUP BY city;
+
+-- c. Display employee names with ‘h’ as last alphabet
+SELECT ename 
+FROM Employee 
+WHERE ename LIKE '%h';
+
+-- d. Modify datatype of a column
+ALTER TABLE Employee 
+MODIFY COLUMN mobno BIGINT
